@@ -1,105 +1,80 @@
 package com.call.myapplication;
 
+import java.util.HashMap;
+import java.util.List;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import java.util.List;
 
 public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
 
-    private List<TitleObject> listDataGroup;
-    private ExpandableListViewAdapter.OnItemClicked onClick;
+    private List<TitleObject> expandableListTitle;
+    private HashMap<TitleObject, List<SubTitleObject>> expandableListDetail;
 
-    public interface OnItemClicked {
-        void onItemClick(int number);
-    }
-
-    public ExpandableListViewAdapter(List<TitleObject> listDataGroup) {
-        this.listDataGroup = listDataGroup;
-    }
-
-    public void setOnClick(OnItemClicked onClick) {
-        this.onClick = onClick;
+    public ExpandableListViewAdapter(List<TitleObject> expandableListTitle,
+                                     HashMap<TitleObject, List<SubTitleObject>> expandableListDetail) {
+        this.expandableListTitle = expandableListTitle;
+        this.expandableListDetail = expandableListDetail;
     }
 
     @Override
-    public Object getChild(int groupPosition, int childPosition) {
-        return this.listDataGroup.get(groupPosition);
+    public Object getChild(int listPosition, int expandedListPosition) {
+        if (expandableListDetail.get(this.expandableListTitle.get(listPosition)) == null)
+            return null;
+        else
+            return this.expandableListDetail.get(this.expandableListTitle.get(listPosition)).get(expandedListPosition);
     }
 
     @Override
-    public long getChildId(int groupPosition, int childPosition) {
-        return childPosition;
+    public long getChildId(int listPosition, int expandedListPosition) {
+        return expandedListPosition;
     }
 
     @Override
     public View getChildView(int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
 
-        final TitleObject titleObject = (TitleObject) getChild(groupPosition, childPosition);
+        final SubTitleObject titleObject = (SubTitleObject) getChild(groupPosition, childPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) parent.getContext()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.list_row_child, null);
         }
 
-        LinearLayout linerLayout = convertView.findViewById(R.id.linerLayout);
-        TextView textView1 = convertView.findViewById(R.id.text1);
-        TextView textView2 = convertView.findViewById(R.id.text2);
-        TextView textView3 = convertView.findViewById(R.id.text3);
-
-        if (titleObject.show) {
-            linerLayout.setVisibility(View.VISIBLE);
-            textView1.setVisibility(View.VISIBLE);
-            textView2.setVisibility(View.VISIBLE);
-            textView3.setVisibility(View.VISIBLE);
-            textView1.setText(titleObject.getStringArrayList().get(0));
-            textView2.setText(titleObject.getStringArrayList().get(1));
-            textView3.setText(titleObject.getStringArrayList().get(2));
-        } else {
-            linerLayout.setVisibility(View.GONE);
-            textView1.setVisibility(View.GONE);
-            textView2.setVisibility(View.GONE);
-            textView3.setVisibility(View.GONE);
+        if (titleObject != null) {
+            TextView textView1 = convertView.findViewById(R.id.text1);
+            textView1.setText(titleObject.getTitle());
         }
-
-        textView1.setOnClickListener(v -> {
-            onClick.onItemClick(0);
-        });
-
-        textView2.setOnClickListener(v -> {
-            onClick.onItemClick(1);
-        });
-
-        textView3.setOnClickListener(v -> {
-            onClick.onItemClick(2);
-        });
-
         return convertView;
     }
 
     @Override
-    public int getChildrenCount(int groupPosition) {
-        return 1;
+    public int getChildrenCount(int listPosition) {
+        if (this.expandableListDetail.get(this.expandableListTitle.get(listPosition)) == null)
+            return 0;
+        else
+            return this.expandableListDetail.get(this.expandableListTitle.get(listPosition)).size();
+
     }
+
     @Override
-    public Object getGroup(int groupPosition) {
-        return this.listDataGroup.get(groupPosition);
+    public Object getGroup(int listPosition) {
+        return this.expandableListTitle.get(listPosition);
     }
 
     @Override
     public int getGroupCount() {
-        return this.listDataGroup.size();
+        return this.expandableListTitle.size();
     }
 
     @Override
-    public long getGroupId(int groupPosition) {
-        return groupPosition;
+    public long getGroupId(int listPosition) {
+        return listPosition;
     }
 
     @Override
@@ -126,7 +101,7 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
+    public boolean isChildSelectable(int listPosition, int expandedListPosition) {
         return true;
     }
 }

@@ -6,9 +6,10 @@ import android.widget.ExpandableListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ExpandableListViewAdapter.OnItemClicked {
+public class MainActivity extends AppCompatActivity  {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,15 +17,11 @@ public class MainActivity extends AppCompatActivity implements ExpandableListVie
         setContentView(R.layout.activity_main);
 
         List<TitleObject> listDataGroup = new ArrayList<>();
-        ArrayList<String> stringArrayList = new ArrayList<>();
-        stringArrayList.add("SubItem1");
-        stringArrayList.add("SubItem2");
-        stringArrayList.add("SubItem3");
+        HashMap<TitleObject, List<SubTitleObject>> expandableListDetail = new HashMap<TitleObject, List<SubTitleObject>>();
 
         TitleObject titleObject = new TitleObject();
         titleObject.setTitle("Text1");
         titleObject.setShow(true);
-        titleObject.setStringArrayList(stringArrayList);
         titleObject.setDrawable(R.drawable.ic_access_time_black_24dp);
 
         TitleObject titleObject1 = new TitleObject();
@@ -40,15 +37,29 @@ public class MainActivity extends AppCompatActivity implements ExpandableListVie
         listDataGroup.add(titleObject);
         listDataGroup.add(titleObject1);
         listDataGroup.add(titleObject2);
+
+        SubTitleObject subTitleObject1 = new SubTitleObject();
+        subTitleObject1.setTitle("ddddd");
+
+        SubTitleObject subTitleObject2 = new SubTitleObject();
+        subTitleObject2.setTitle("sss");
+
+        SubTitleObject subTitleObject3 = new SubTitleObject();
+        subTitleObject3.setTitle("sssssss");
+
+
+        List<SubTitleObject> subTitleObjectList = new ArrayList<>();
+        subTitleObjectList.add(subTitleObject1);
+        subTitleObjectList.add(subTitleObject2);
+        subTitleObjectList.add(subTitleObject3);
+
+        expandableListDetail.put(titleObject, subTitleObjectList);
+        expandableListDetail.put(titleObject1, null);
+        expandableListDetail.put(titleObject2, null);
+
         ExpandableListView expandableListView = findViewById(R.id.expandableListView);
-        ExpandableListViewAdapter expandableListViewAdapter = new ExpandableListViewAdapter(listDataGroup);
+        ExpandableListViewAdapter expandableListViewAdapter = new ExpandableListViewAdapter(listDataGroup, expandableListDetail);
         expandableListView.setAdapter(expandableListViewAdapter);
-        expandableListViewAdapter.setOnClick(MainActivity.this);
     }
 
-    @Override
-    public void onItemClick(int number) {
-        Toast.makeText(this, String.valueOf(number),
-                Toast.LENGTH_LONG).show();
-    }
 }
